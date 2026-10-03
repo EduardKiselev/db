@@ -1,307 +1,142 @@
 
-README.md
-
 # GameHub - Redis Backend
 
-Бэкенд для платформы управления игровыми турнирами на базе Redis с использованием Sentinel для отказоустойчивости.
+Бэкенд для платформы управления игровыми турнирами на базе Redis с Sentinel.
 
 ## Архитектура
 
-### Компоненты системы
+- **Redis Master** (6379) — запись, персистентность RDB + AOF
+- **Redis Replicas** (6380, 6381) — чтение, 2 реплики
+- **Redis Sentinel** (26379-26381) — автоматический failover, кворум 2
+- **Flask API** (5001) — REST API через Sentinel
+- **Redis Insight** (5540) — веб-интерфейс (опционально)
 
-1. **Redis Master** (порт 6379)
+## Структура данных
 
-   - Основной узел для операций записи
-   - Персистентность: RDB + AOF
-   - Защита от split-brain: `min-replicas-to-write 1`
-2. **Redis Replicas** (порты 6380, 6381)
-
-   - 2 реплики для операций чтения
-   - Режим только для чтения: `replica-read-only yes`
-3. **Redis Sentinel** (порты 26379, 26380, 26381)
-
-   - 3 Sentinel процесса для автоматического переключения
-   - Кворум: 2
-   - Автоматическое обнаружение отказов и failover
-4. **Redis Insight** (порт 5540)
-
-   - Веб-интерфейс для мониторинга (опционально)
-5. **Flask Application** (порт 5000)
-
-   - REST API сервис
-   - Подключение через Sentinel
-   - Кэширование, Lua-скрипты, Streams, Pipeline
-
-## Структура данных в Redis
-
-| Тип данных | Ключ              | Описание                      | TTL         |
-| ------------------- | --------------------- | ------------------------------------- | ----------- |
-| Hash                | `player:{id}`       | Профиль игрока           | ∞          |
-| String              | `cache:player:{id}` | Кэш профиля                 | 60 сек   |
-| String              | `logins:{id}`       | Счетчик входов           | 24 часа |
-| Sorted Set          | `tournament:main`   | Лидерборд                    | ∞          |
-| Set                 | `achievements:{id}` | Достижения игрока     | ∞          |
-| Stream              | `notifications`     | Очередь уведомлений | 7 дней  |
+| Тип     | Ключ              | Назначение                   |
+| ---------- | --------------------- | -------------------------------------- |
+| Hash       | `player:{id}`       | Профиль игрока            |
+| String     | `cache:player:{id}` | Кэш профиля (TTL 60с)       |
+| String     | `logins:{id}`       | Счётчик входов (TTL 24ч) |
+| Sorted Set | `tournament:main`   | Лидерборд                     |
+| Set        | `achievements:{id}` | Достижения                   |
+| Stream     | `notifications`     | Очередь уведомлений  |
 
 ## Быстрый старт
 
-### 1. Запуск инфраструктуры
+Запуск всех тестов одной командой:
 
 ```bash
-docker compose up -d
+./run_tests.sh
 ```
 
-Проверка статуса:
+Скрипт автоматически:
+
+- Остановит и удалит старые контейнеры
+- Запустит Redis (мастер + 2 реплики + 3 Sentinel)
+- Дождётся готовности всех реплик
+- Заполнит тестовые данные
+- Запустит проверку dz1_check.py
+- Остановит контейнеры после завершения
+
+**Флаги:**
+
+- `--no-clean` — пропустить начальную очистку (если контейнеры уже запущены)
+- `--keep` — не останавливать контейнеры после тестов
+
+**Примеры:**
 
 ```bash
-docker compose ps
-```
+# Полный цикл с очисткой
+./run_tests.sh
 
-Должны быть запущены 6 контейнеров:
+# Без начальной очистки
+./run_tests.sh --no-clean
 
-- redis-master
-- redis-replica-1, redis-replica-2
-- sentinel-1, sentinel-2, sentinel-3
-- redis-insight (опционально)
+# Оставить контейнеры работающими
+./run_tests.sh --keep
 
-### 2. Проверка репликации
-
-```bash
-docker compose exec redis-master redis-cli INFO replication | grep connected_slaves
-```
-
-Должно показать: `connected_slaves:2`
-
-### 3. Установка зависимостей
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Запуск приложения
-
-```bash
-python app.py
-```
-
-Приложение будет доступно на http://localhost:5000
-
-### 5. Предзаполнение тестовых данных
-
-```bash
-python seed_data.py
-```
-
-Это создаст все необходимые данные для прохождения автоматической проверки.
-
-### 6. Автоматическая проверка
-
-```bash
-python dz1_check.py
+# Комбинация флагов
+./run_tests.sh --no-clean --keep
 ```
 
 ## API Endpoints
 
-### Профили игроков
-
-**Создать/обновить профиль**
+**Профили:**
 
 ```bash
-curl -X POST http://localhost:5000/api/players/1001 \
+# Создать профиль
+curl -X POST http://localhost:5001/api/players/1001 \
   -H "Content-Type: application/json" \
   -d '{"name": "Player1", "level": 10, "region": "eu"}'
+
+# Получить профиль (с кэшированием)
+curl http://localhost:5001/api/players/1001
+
+# Зафиксировать вход (Lua-скрипт)
+curl -X POST http://localhost:5001/api/players/1001/login
 ```
 
-**Получить профиль (с кэшированием)**
+**Лидерборд:**
 
 ```bash
-curl http://localhost:5000/api/players/1001
-```
-
-**Обновить уровень**
-
-```bash
-curl -X PATCH http://localhost:5000/api/players/1001/level \
-  -H "Content-Type: application/json" \
-  -d '{"delta": 5}'
-```
-
-**Зафиксировать вход (Lua-скрипт)**
-
-```bash
-curl -X POST http://localhost:5000/api/players/1001/login
-```
-
-### Лидерборд
-
-**Добавить/обновить очки**
-
-```bash
-curl -X POST http://localhost:5000/api/leaderboard/score \
+# Добавить очки
+curl -X POST http://localhost:5001/api/leaderboard/score \
   -H "Content-Type: application/json" \
   -d '{"player_id": 1001, "score": 100}'
+
+# Топ-10
+curl http://localhost:5001/api/leaderboard/top?limit=10
 ```
 
-**Топ-10 игроков**
+**Достижения:**
 
 ```bash
-curl http://localhost:5000/api/leaderboard/top?limit=10
-```
-
-**Место игрока**
-
-```bash
-curl http://localhost:5000/api/leaderboard/rank/1001
-```
-
-### Достижения
-
-**Добавить достижение**
-
-```bash
-curl -X POST http://localhost:5000/api/players/1001/achievements \
+# Добавить достижение
+curl -X POST http://localhost:5001/api/players/1001/achievements \
   -H "Content-Type: application/json" \
   -d '{"achievement_name": "first_win"}'
+
+# Общие достижения двух игроков
+curl http://localhost:5001/api/players/1001/achievements/common/1002
 ```
 
-**Проверить наличие достижения**
+**Массовые операции:**
 
 ```bash
-curl http://localhost:5000/api/players/1001/achievements/first_win
-```
-
-**Общие достижения двух игроков**
-
-```bash
-curl http://localhost:5000/api/players/1001/achievements/common/1002
-```
-
-### Массовые операции
-
-**Массовое создание профилей (Pipeline)**
-
-```bash
-curl -X POST http://localhost:5000/api/players/batch \
+# Массовое создание (Pipeline)
+curl -X POST http://localhost:5001/api/players/batch \
   -H "Content-Type: application/json" \
-  -d '{
-    "players": [
-      {"id": 2001, "name": "Player1", "level": 5, "region": "eu"},
-      {"id": 2002, "name": "Player2", "level": 10, "region": "us"},
-      {"id": 2003, "name": "Player3", "level": 15, "region": "asia"}
-    ]
-  }'
+  -d '{"players": [{"id": 2001, "name": "P1", "level": 5, "region": "eu"}]}'
 ```
 
-## Демонстрация отказоустойчивости
-
-### 1. Проверка Sentinel
+## Проверка отказоустойчивости
 
 ```bash
+# Проверка Sentinel
 docker compose exec sentinel-1 redis-cli -p 26379 SENTINEL masters
-```
 
-### 2. Остановка мастера
-
-```bash
+# Остановка мастера
 docker stop redis-master
-```
 
-Ждем ~15 секунд, затем проверяем:
-
-```bash
+# Проверка нового мастера (через 15 сек)
 docker compose exec sentinel-1 redis-cli -p 26379 SENTINEL get-master-addr-by-name mymaster
-```
 
-Sentinel должен показать адрес одной из реплик.
-
-### 3. Проверка работы приложения
-
-Приложение продолжает работать через нового мастера.
-
-### 4. Восстановление мастера
-
-```bash
+# Восстановление
 docker start redis-master
 ```
 
-Старый мастер автоматически станет репликой нового мастера.
-
-## Демонстрация защиты от split-brain
+## Проверка защиты от split-brain
 
 ```bash
-# Приостанавливаем все реплики
+# Приостановка реплик
 docker pause redis-replica-1 redis-replica-2
 
-# Пытаемся записать - получим ошибку
-curl -X POST http://localhost:5000/api/players/9999 \
+# Попытка записи (должна вернуться ошибка)
+curl -X POST http://localhost:5001/api/players/9999 \
   -H "Content-Type: application/json" \
   -d '{"name": "Test"}'
 
-# Восстанавливаем реплики
+# Восстановление
 docker unpause redis-replica-1 redis-replica-2
-```
-
-## Кэширование
-
-Первый запрос (cache miss):
-
-```bash
-curl http://localhost:5000/api/players/1001
-```
-
-Второй запрос (cache hit):
-
-```bash
-curl http://localhost:5000/api/players/1001
-```
-
-Проверка TTL кэша:
-
-```bash
-docker compose exec redis-master redis-cli TTL cache:player:1001
-```
-
-## Очередь уведомлений (Streams)
-
-При обновлении уровня игрока автоматически создается уведомление:
-
-```bash
-curl -X PATCH http://localhost:5000/api/players/1001/level \
-  -H "Content-Type: application/json" \
-  -d '{"delta": 5}'
-```
-
-Проверка потока:
-
-```bash
-docker compose exec redis-master redis-cli XLEN notifications
-docker compose exec redis-master redis-cli XRANGE notifications - +
-```
-
-Consumer автоматически читает и подтверждает сообщения (XACK).
-
-## Технологии
-
-- **Python 3.10+**
-- **Flask 3.0** - веб-фреймворк
-- **redis-py 5.0** - клиент Redis с поддержкой Sentinel
-- **Redis 7** - хранилище данных
-- **Docker Compose** - оркестрация контейнеров
-
-## Особенности реализации
-
-1. **Подключение через Sentinel** - автоматическое обнаружение мастера и реплик
-2. **Lua-скрипты** - атомарные операции (счетчик входов с TTL)
-3. **Кэширование** - Cache-Aside паттерн с TTL 60 секунд
-4. **Streams** - очередь уведомлений с consumer groups
-5. **Pipeline** - массовая загрузка данных
-6. **Разделение чтения/записи** - запись на мастер, чтение с реплик
-
-## Troubleshooting
-
-### Контейнеры не запускаются
-
-```bash
-docker compose down -v
-docker compose up -d
 ```

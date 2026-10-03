@@ -397,7 +397,7 @@ if __name__ == '__main__':
     consumer_thread = threading.Thread(target=notification_consumer, daemon=True)
     consumer_thread.start()
     
-    print("\n🚀 GameHub API запущен на http://localhost:5000")
+    print("\n🚀 GameHub API запущен на http://localhost:5001")
     print("📊 Доступные эндпоинты:")
     print("   POST   /api/players/<id>              - Создать/обновить профиль")
     print("   GET    /api/players/<id>              - Получить профиль (с кэшем)")
