@@ -1,0 +1,37 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Виртуальные окружения
+venv/
+env/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Redis data
+redis-data/
+redis-master-data/
+redis-replica-1-data/
+redis-replica-2-data/
+redis-insight-data/
+
+to_txt.py
+hw3.pdf
+hw3.txt
+hw2/materials/
+materials-txt/
+
