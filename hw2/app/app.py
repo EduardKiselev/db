@@ -313,73 +313,6 @@ def batch_create_players():
         "method": "pipeline"
     }), 200
 
-@app.route('/api/init', methods=['POST'])
-def initialize_data():
-    """Инициализация тестовых данных для проверки"""
-    master = get_master()
-    
-    try:
-        # 1. Создаем игрока 1001
-        master.hset("player:1001", mapping={
-            "name": "TestPlayer",
-            "level": "10",
-            "region": "eu",
-            "created_at": str(int(time.time()))
-        })
-        
-        # 2. Добавляем в лидерборд
-        master.zadd("tournament:main", {"1001": 1500})
-        
-        # 3. Добавляем достижения
-        master.sadd("achievements:1001", "first_win", "speed_run", "explorer")
-        
-        # 4. Фиксируем вход (создаем счетчик с TTL)
-        lua_scripts.increment_login_counter(1001, ttl_seconds=86400)
-        
-        # 5. Заполняем кэш (имитируем GET запрос)
-        player_data = master.hgetall("player:1001")
-        master.set("cache:player:1001", json.dumps(player_data), ex=60)
-        
-        # 6. Добавляем сообщение в stream
-        master.xadd('notifications', {
-            'player_id': '1001',
-            'type': 'init',
-            'message': 'System initialized',
-            'timestamp': str(int(time.time()))
-        })
-        
-        # 7. Создаем еще 15 игроков через pipeline
-        pipeline = master.pipeline()
-        for i in range(1002, 1017):
-            pipeline.hset(f"player:{i}", mapping={
-                "name": f"Player{i}",
-                "level": str(i % 20 + 1),
-                "region": "eu",
-                "created_at": str(int(time.time()))
-            })
-            pipeline.zadd("tournament:main", {str(i): i * 100})
-        
-        pipeline.execute()
-        
-        return jsonify({
-            "status": "success",
-            "message": "Test data initialized",
-            "players_created": 16
-        }), 200
-        
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/health', methods=['GET'])
-def health_check():
-    """Проверка здоровья приложения"""
-    try:
-        master = get_master()
-        master.ping()
-        return jsonify({"status": "healthy", "redis": "connected"}), 200
-    except Exception as e:
-        return jsonify({"status": "unhealthy", "error": str(e)}), 500
-
 if __name__ == '__main__':
     # Инициализируем Redis
     if not init_redis():
@@ -410,8 +343,6 @@ if __name__ == '__main__':
     print("   GET    /api/players/<id>/achievements/<name> - Проверить достижение")
     print("   GET    /api/players/<id1>/achievements/common/<id2> - Общие достижения")
     print("   POST   /api/players/batch              - Массовое создание")
-    print("   POST   /api/init                       - Инициализация тестовых данных")
-    print("   GET    /health                         - Проверка здоровья\n")
     
     # Запускаем Flask
     app.run(host='0.0.0.0', port=5000, debug=False)
