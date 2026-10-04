@@ -1,4 +1,3 @@
-CU/db/hw2/run_tests.sh
 #!/bin/bash
 set -e
 
@@ -91,7 +90,7 @@ echo "────────────────────────�
 
 if [ "$KEEP_RUNNING" = false ]; then
     echo "Остановка контейнеров... (--keep чтобы оставить)"
-    docker compose down -v > /dev/null 2>&1
+    docker compose down -v
     echo "OK: Контейнеры остановлены"
 else
     echo ""

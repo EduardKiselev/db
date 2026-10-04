@@ -1,0 +1,136 @@
+# Запуск всех контейнеров
+docker compose up -d --build
+
+# Проверка статуса
+docker compose ps
+
+# Проверка репликации
+docker compose exec redis-master redis-cli INFO replication | grep connected_slaves
+
+# Обновление уровня
+curl -X PATCH http://localhost:5001/api/players/2001/level \
+  -H "Content-Type: application/json" \
+  -d '{"delta": 3}'
+
+# Добавление очков в лидерборд
+curl -X POST http://localhost:5001/api/leaderboard/score \
+  -H "Content-Type: application/json" \
+  -d '{"player_id": 2001, "score": 500}'
+
+# Топ-10 игроков
+curl http://localhost:5001/api/leaderboard/top?limit=10
+
+# Место игрока
+curl http://localhost:5001/api/leaderboard/rank/2001
+
+# Добавление достижения
+curl -X POST http://localhost:5001/api/players/2001/achievements \
+  -H "Content-Type: application/json" \
+  -d '{"achievement_name": "demo_achievement"}'
+
+# Проверка наличия достижения
+curl http://localhost:5001/api/players/2001/achievements/demo_achievement
+
+# Общие достижения двух игроков
+curl http://localhost:5001/api/players/1001/achievements/common/1002
+
+# Фиксация входа (Lua-скрипт)
+curl -X POST http://localhost:5001/api/players/2001/login
+
+
+# Удаляем кэш для чистого теста
+docker compose exec redis-master redis-cli DEL cache:player:2001
+
+# Первый запрос (cache miss)
+curl http://localhost:5001/api/players/2001
+
+# Проверяем, что кэш создался
+docker compose exec redis-master redis-cli TTL cache:player:2001
+
+# Второй запрос (cache hit) — должен быть быстрее
+curl http://localhost:5001/api/players/2001
+
+
+# Проверяем длину потока до
+docker compose exec redis-master redis-cli XLEN notifications
+
+# Обновляем уровень (должно создать уведомление)
+curl -X PATCH http://localhost:5001/api/players/2001/level \
+  -H "Content-Type: application/json" \
+  -d '{"delta": 1}'
+
+# Проверяем длину потока после
+docker compose exec redis-master redis-cli XLEN notifications
+
+# Смотрим сообщения в потоке
+docker compose exec redis-master redis-cli XRANGE notifications - +
+
+# Проверяем consumer group
+docker compose exec redis-master redis-cli XINFO GROUPS notifications
+
+# Проверяем текущий мастер
+docker compose exec sentinel-1 redis-cli -p 26379 SENTINEL get-master-addr-by-name mymaster
+
+# Останавливаем мастер
+docker stop redis-master
+
+# Ждём ~15 секунд
+sleep 15
+
+# Проверяем новый мастер (должен быть один из реплик)
+docker compose exec sentinel-1 redis-cli -p 26379 SENTINEL get-master-addr-by-name mymaster
+
+# Проверяем, что приложение работает
+curl http://localhost:5001/api/players/1001
+
+# Восстанавливаем мастер
+docker pause redis-master
+
+
+# Приостанавливаем все реплики
+docker pause redis-replica-1 redis-replica-2
+
+# Пытаемся записать (должна вернуться ошибка)
+curl -X POST http://localhost:5001/api/players/9999 \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Test"}'
+
+# Восстанавливаем реплики
+docker unpause redis-replica-1 redis-replica-2
+
+# Проверяем, что запись снова работает
+curl -X POST http://localhost:5001/api/players/9999 \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Test"}'
+
+
+# Массовое создание 20 профилей через pipeline
+curl -X POST http://localhost:5001/api/players/batch \
+  -H "Content-Type: application/json" \
+  -d '{
+    "players": [
+      {"id": 3001, "name": "Batch1", "level": 10, "region": "eu"},
+      {"id": 3002, "name": "Batch2", "level": 15, "region": "us"},
+      {"id": 3003, "name": "Batch3", "level": 20, "region": "asia"},
+      {"id": 3004, "name": "Batch4", "level": 25, "region": "eu"},
+      {"id": 3005, "name": "Batch5", "level": 30, "region": "us"},
+      {"id": 3006, "name": "Batch6", "level": 35, "region": "asia"},
+      {"id": 3007, "name": "Batch7", "level": 40, "region": "eu"},
+      {"id": 3008, "name": "Batch8", "level": 45, "region": "us"},
+      {"id": 3009, "name": "Batch9", "level": 50, "region": "asia"},
+      {"id": 3010, "name": "Batch10", "level": 55, "region": "eu"},
+      {"id": 3011, "name": "Batch11", "level": 60, "region": "us"},
+      {"id": 3012, "name": "Batch12", "level": 65, "region": "asia"},
+      {"id": 3013, "name": "Batch13", "level": 70, "region": "eu"},
+      {"id": 3014, "name": "Batch14", "level": 75, "region": "us"},
+      {"id": 3015, "name": "Batch15", "level": 80, "region": "asia"},
+      {"id": 3016, "name": "Batch16", "level": 85, "region": "eu"},
+      {"id": 3017, "name": "Batch17", "level": 90, "region": "us"},
+      {"id": 3018, "name": "Batch18", "level": 95, "region": "asia"},
+      {"id": 3019, "name": "Batch19", "level": 100, "region": "eu"},
+      {"id": 3020, "name": "Batch20", "level": 105, "region": "us"}
+    ]
+  }'
+
+# Проверяем, что профили создались
+docker compose exec redis-master redis-cli KEYS player:30*

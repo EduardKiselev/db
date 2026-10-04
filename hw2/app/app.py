@@ -35,6 +35,7 @@ def notification_consumer():
     consumer_name = "consumer-1"
     
     print("✓ Notification consumer запущен")
+    time.sleep(1)
     
     while consumer_running:
         try:
