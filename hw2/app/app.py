@@ -5,6 +5,13 @@ import threading
 from redis_client import init_redis, get_master, get_slave
 from lua_scripts import LuaScripts
 
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.DEBUG,
+)
+
 app = Flask(__name__)
 
 # Глобальные объекты
@@ -58,7 +65,7 @@ def notification_consumer():
                         master.xack('notifications', 'notifications-group', message_id)
                         
         except Exception as e:
-            print(f"✗ Ошибка в consumer: {e}")
+            print(f"Ошибка в consumer: {e}")
             time.sleep(1)
 
 # ==================== API ENDPOINTS ====================
@@ -104,9 +111,11 @@ def get_player(player_id):
     
     if cached:
         # Cache hit
+        logger.debug(f"CACHE HIT: player:{player_id}")
         return jsonify(json.loads(cached)), 200
     
     # Cache miss - читаем из основного хранилища
+    logger.debug(f"CACHE MISS: player:{player_id}")
     player_data = master.hgetall(f"player:{player_id}")
     
     if not player_data:
@@ -122,11 +131,17 @@ def get_player(player_id):
 def update_player_level(player_id):
     """Обновление уровня игрока"""
     data = request.json
-    
-    if not data or 'delta' not in data:
-        return jsonify({"error": "delta is required"}), 400
-    
+
+    if not data:
+        return jsonify({"error": "request error"}), 400
+
     master = get_master()
+
+    if not master.exists(f"player:{player_id}"):
+        return jsonify({"error": f"Player {player_id} not found"}), 404
+    
+    if not 'delta' not in data:
+        return jsonify({"error": "delta is required"}), 400
     
     # Увеличиваем уровень
     new_level = master.hincrby(f"player:{player_id}", "level", data['delta'])
@@ -301,6 +316,7 @@ def batch_create_players():
         
         # Добавляем команду в pipeline
         pipeline.hset(f"player:{player_id}", mapping=fields)
+        pipeline.delete(f"cache:player:{player_id}")
     
     # Выполняем все команды одной пачкой
     start_time = time.time()

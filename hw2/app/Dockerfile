@@ -2,8 +2,14 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Устанавливаем зависимости
+# Копируем локальные пакеты
+COPY packages/ ./packages/
+
+# Копируем requirements.txt
 COPY requirements.txt .
+
+# Устанавливаем из локальных файлов
+# RUN pip install --no-cache-dir --no-index --find-links=./packages -r requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Копируем код приложения

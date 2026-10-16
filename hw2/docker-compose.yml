@@ -21,6 +21,8 @@ services:
   redis-replica-1:
     image: redis:7-alpine
     container_name: redis-replica-1
+    ports:
+      - "6380:6379"
     volumes:
       - ./redis-replica.conf:/usr/local/etc/redis/redis.conf
     command: redis-server /usr/local/etc/redis/redis.conf
@@ -34,6 +36,8 @@ services:
   redis-replica-2:
     image: redis:7-alpine
     container_name: redis-replica-2
+    ports:
+      - "6381:6379"
     volumes:
       - ./redis-replica.conf:/usr/local/etc/redis/redis.conf
     command: redis-server /usr/local/etc/redis/redis.conf
@@ -50,8 +54,9 @@ services:
     ports:
       - "26379:26379"
     volumes:
-      - ./sentinel.conf:/etc/redis/sentinel.conf
-    command: redis-sentinel /etc/redis/sentinel.conf
+      - ./sentinel-1.conf:/etc/redis/sentinel-1.conf
+      - sentinel-1-data:/data
+    command: redis-sentinel /etc/redis/sentinel-1.conf
     depends_on:
       - redis-master
       - redis-replica-1
@@ -64,10 +69,11 @@ services:
     image: redis:7-alpine
     container_name: sentinel-2
     ports:
-      - "26380:26379"
+      - "26380:26380"
     volumes:
-      - ./sentinel.conf:/etc/redis/sentinel.conf
-    command: redis-sentinel /etc/redis/sentinel.conf
+      - ./sentinel-2.conf:/etc/redis/sentinel-2.conf
+      - sentinel-2-data:/data
+    command: redis-sentinel /etc/redis/sentinel-2.conf
     depends_on:
       - redis-master
       - redis-replica-1
@@ -80,10 +86,11 @@ services:
     image: redis:7-alpine
     container_name: sentinel-3
     ports:
-      - "26381:26379"
+      - "26381:26381"
     volumes:
-      - ./sentinel.conf:/etc/redis/sentinel.conf
-    command: redis-sentinel /etc/redis/sentinel.conf
+      - ./sentinel-3.conf:/etc/redis/sentinel-3.conf
+      - sentinel-3-data:/data
+    command: redis-sentinel /etc/redis/sentinel-3.conf
     depends_on:
       - redis-master
       - redis-replica-1
@@ -98,7 +105,7 @@ services:
     ports:
       - "5001:5000"
     environment:
-      - REDIS_SENTINEL_HOSTS=sentinel-1:26379,sentinel-2:26379,sentinel-3:26379
+      - REDIS_SENTINEL_HOSTS=sentinel-1:26379,sentinel-2:26380,sentinel-3:26381
       - REDIS_MASTER_NAME=mymaster
     depends_on:
       - sentinel-1
@@ -110,6 +117,9 @@ services:
 
 volumes:
   redis-master-data:
+  sentinel-1-data:
+  sentinel-2-data:
+  sentinel-3-data:
 
 networks:
   redis-network:
