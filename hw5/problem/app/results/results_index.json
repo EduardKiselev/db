@@ -1,0 +1,1729 @@
+{
+  "dataset": "2026-10-05",
+  "scenarios": {
+    "index": {
+      "status": "passed",
+      "startedAt": {
+        "$date": {
+          "$numberLong": "1792352714044"
+        }
+      },
+      "solutionHash": "46a2b08f6fbdc82b19dc87c52469b3f48e5c588b0f8f5c82c2041301385255a5",
+      "checks": [
+        "10000 documents",
+        "only _id index initially",
+        "same IDs and order",
+        "matches independent fixture order",
+        "before scans collection + SORT",
+        "after uses IXSCAN without SORT",
+        "examines fewer documents"
+      ],
+      "artifacts": {
+        "explain-before": {
+          "explainVersion": "1",
+          "queryPlanner": {
+            "namespace": "hw2.orders",
+            "parsedQuery": {
+              "$and": [
+                {
+                  "status": {
+                    "$eq": "paid"
+                  }
+                },
+                {
+                  "userId": {
+                    "$eq": {
+                      "$numberInt": "2500"
+                    }
+                  }
+                }
+              ]
+            },
+            "indexFilterSet": false,
+            "queryHash": "DFD91C33",
+            "planCacheShapeHash": "DFD91C33",
+            "planCacheKey": "FB45820F",
+            "optimizationTimeMillis": {
+              "$numberInt": "0"
+            },
+            "maxIndexedOrSolutionsReached": false,
+            "maxIndexedAndSolutionsReached": false,
+            "maxScansToExplodeReached": false,
+            "prunedSimilarIndexes": false,
+            "winningPlan": {
+              "isCached": false,
+              "stage": "SORT",
+              "sortPattern": {
+                "createdAt": {
+                  "$numberInt": "-1"
+                },
+                "_id": {
+                  "$numberInt": "1"
+                }
+              },
+              "memLimit": {
+                "$numberInt": "104857600"
+              },
+              "limitAmount": {
+                "$numberInt": "20"
+              },
+              "type": "simple",
+              "inputStage": {
+                "stage": "COLLSCAN",
+                "filter": {
+                  "$and": [
+                    {
+                      "status": {
+                        "$eq": "paid"
+                      }
+                    },
+                    {
+                      "userId": {
+                        "$eq": {
+                          "$numberInt": "2500"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "direction": "forward"
+              }
+            },
+            "rejectedPlans": []
+          },
+          "executionStats": {
+            "executionSuccess": true,
+            "nReturned": {
+              "$numberInt": "20"
+            },
+            "executionTimeMillis": {
+              "$numberInt": "9"
+            },
+            "totalKeysExamined": {
+              "$numberInt": "0"
+            },
+            "totalDocsExamined": {
+              "$numberInt": "10000"
+            },
+            "executionStages": {
+              "isCached": false,
+              "stage": "SORT",
+              "nReturned": {
+                "$numberInt": "20"
+              },
+              "executionTimeMillisEstimate": {
+                "$numberInt": "4"
+              },
+              "works": {
+                "$numberInt": "10022"
+              },
+              "advanced": {
+                "$numberInt": "20"
+              },
+              "needTime": {
+                "$numberInt": "10001"
+              },
+              "needYield": {
+                "$numberInt": "0"
+              },
+              "saveState": {
+                "$numberInt": "0"
+              },
+              "restoreState": {
+                "$numberInt": "0"
+              },
+              "isEOF": {
+                "$numberInt": "1"
+              },
+              "sortPattern": {
+                "createdAt": {
+                  "$numberInt": "-1"
+                },
+                "_id": {
+                  "$numberInt": "1"
+                }
+              },
+              "memLimit": {
+                "$numberInt": "104857600"
+              },
+              "limitAmount": {
+                "$numberInt": "20"
+              },
+              "type": "simple",
+              "totalDataSizeSorted": {
+                "$numberInt": "4960"
+              },
+              "usedDisk": false,
+              "spills": {
+                "$numberInt": "0"
+              },
+              "spilledDataStorageSize": {
+                "$numberInt": "0"
+              },
+              "inputStage": {
+                "stage": "COLLSCAN",
+                "filter": {
+                  "$and": [
+                    {
+                      "status": {
+                        "$eq": "paid"
+                      }
+                    },
+                    {
+                      "userId": {
+                        "$eq": {
+                          "$numberInt": "2500"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "nReturned": {
+                  "$numberInt": "1600"
+                },
+                "executionTimeMillisEstimate": {
+                  "$numberInt": "4"
+                },
+                "works": {
+                  "$numberInt": "10001"
+                },
+                "advanced": {
+                  "$numberInt": "1600"
+                },
+                "needTime": {
+                  "$numberInt": "8400"
+                },
+                "needYield": {
+                  "$numberInt": "0"
+                },
+                "saveState": {
+                  "$numberInt": "0"
+                },
+                "restoreState": {
+                  "$numberInt": "0"
+                },
+                "isEOF": {
+                  "$numberInt": "1"
+                },
+                "direction": "forward",
+                "docsExamined": {
+                  "$numberInt": "10000"
+                }
+              }
+            }
+          },
+          "queryShapeHash": "635D4F00B666E61B713823BFECAABA5DFB3B4184E1C2F1FC6D7392224E8D6FD2",
+          "command": {
+            "find": "orders",
+            "filter": {
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "status": "paid"
+            },
+            "sort": {
+              "createdAt": {
+                "$numberInt": "-1"
+              },
+              "_id": {
+                "$numberInt": "1"
+              }
+            },
+            "limit": {
+              "$numberInt": "20"
+            },
+            "$db": "hw2"
+          },
+          "serverInfo": {
+            "host": "e9d8aa3009c2",
+            "port": {
+              "$numberInt": "27017"
+            },
+            "version": "8.0.30",
+            "gitVersion": "360770fbc9b6a893748150d2ab2799e119b9fac9"
+          },
+          "serverParameters": {
+            "internalQueryFacetBufferSizeBytes": {
+              "$numberInt": "104857600"
+            },
+            "internalQueryFacetMaxOutputDocSizeBytes": {
+              "$numberInt": "104857600"
+            },
+            "internalLookupStageIntermediateDocumentMaxSizeBytes": {
+              "$numberInt": "104857600"
+            },
+            "internalDocumentSourceGroupMaxMemoryBytes": {
+              "$numberInt": "104857600"
+            },
+            "internalQueryMaxBlockingSortMemoryUsageBytes": {
+              "$numberInt": "104857600"
+            },
+            "internalQueryProhibitBlockingMergeOnMongoS": {
+              "$numberInt": "0"
+            },
+            "internalQueryMaxAddToSetBytes": {
+              "$numberInt": "104857600"
+            },
+            "internalDocumentSourceSetWindowFieldsMaxMemoryBytes": {
+              "$numberInt": "104857600"
+            },
+            "internalQueryFrameworkControl": "trySbeRestricted",
+            "internalQueryPlannerIgnoreIndexWithCollationForRegex": {
+              "$numberInt": "1"
+            }
+          },
+          "ok": {
+            "$numberInt": "1"
+          },
+          "$clusterTime": {
+            "clusterTime": {
+              "$timestamp": {
+                "t": 1792352714,
+                "i": 26
+              }
+            },
+            "signature": {
+              "hash": {
+                "$binary": {
+                  "base64": "AAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+                  "subType": "00"
+                }
+              },
+              "keyId": {
+                "$numberLong": "0"
+              }
+            }
+          },
+          "operationTime": {
+            "$timestamp": {
+              "t": 1792352714,
+              "i": 26
+            }
+          }
+        },
+        "explain-after": {
+          "explainVersion": "1",
+          "queryPlanner": {
+            "namespace": "hw2.orders",
+            "parsedQuery": {
+              "$and": [
+                {
+                  "status": {
+                    "$eq": "paid"
+                  }
+                },
+                {
+                  "userId": {
+                    "$eq": {
+                      "$numberInt": "2500"
+                    }
+                  }
+                }
+              ]
+            },
+            "indexFilterSet": false,
+            "queryHash": "DFD91C33",
+            "planCacheShapeHash": "DFD91C33",
+            "planCacheKey": "F0D6D863",
+            "optimizationTimeMillis": {
+              "$numberInt": "0"
+            },
+            "maxIndexedOrSolutionsReached": false,
+            "maxIndexedAndSolutionsReached": false,
+            "maxScansToExplodeReached": false,
+            "prunedSimilarIndexes": false,
+            "winningPlan": {
+              "isCached": false,
+              "stage": "LIMIT",
+              "limitAmount": {
+                "$numberInt": "20"
+              },
+              "inputStage": {
+                "stage": "FETCH",
+                "inputStage": {
+                  "stage": "IXSCAN",
+                  "keyPattern": {
+                    "userId": {
+                      "$numberInt": "1"
+                    },
+                    "status": {
+                      "$numberInt": "1"
+                    },
+                    "createdAt": {
+                      "$numberInt": "-1"
+                    },
+                    "_id": {
+                      "$numberInt": "1"
+                    }
+                  },
+                  "indexName": "history_user_status_date_id",
+                  "isMultiKey": false,
+                  "multiKeyPaths": {
+                    "userId": [],
+                    "status": [],
+                    "createdAt": [],
+                    "_id": []
+                  },
+                  "isUnique": false,
+                  "isSparse": false,
+                  "isPartial": false,
+                  "indexVersion": {
+                    "$numberInt": "2"
+                  },
+                  "direction": "forward",
+                  "indexBounds": {
+                    "userId": [
+                      "[2500, 2500]"
+                    ],
+                    "status": [
+                      "[\"paid\", \"paid\"]"
+                    ],
+                    "createdAt": [
+                      "[MaxKey, MinKey]"
+                    ],
+                    "_id": [
+                      "[MinKey, MaxKey]"
+                    ]
+                  }
+                }
+              }
+            },
+            "rejectedPlans": []
+          },
+          "executionStats": {
+            "executionSuccess": true,
+            "nReturned": {
+              "$numberInt": "20"
+            },
+            "executionTimeMillis": {
+              "$numberInt": "1"
+            },
+            "totalKeysExamined": {
+              "$numberInt": "20"
+            },
+            "totalDocsExamined": {
+              "$numberInt": "20"
+            },
+            "executionStages": {
+              "isCached": false,
+              "stage": "LIMIT",
+              "nReturned": {
+                "$numberInt": "20"
+              },
+              "executionTimeMillisEstimate": {
+                "$numberInt": "0"
+              },
+              "works": {
+                "$numberInt": "21"
+              },
+              "advanced": {
+                "$numberInt": "20"
+              },
+              "needTime": {
+                "$numberInt": "0"
+              },
+              "needYield": {
+                "$numberInt": "0"
+              },
+              "saveState": {
+                "$numberInt": "0"
+              },
+              "restoreState": {
+                "$numberInt": "0"
+              },
+              "isEOF": {
+                "$numberInt": "1"
+              },
+              "limitAmount": {
+                "$numberInt": "20"
+              },
+              "inputStage": {
+                "stage": "FETCH",
+                "nReturned": {
+                  "$numberInt": "20"
+                },
+                "executionTimeMillisEstimate": {
+                  "$numberInt": "0"
+                },
+                "works": {
+                  "$numberInt": "20"
+                },
+                "advanced": {
+                  "$numberInt": "20"
+                },
+                "needTime": {
+                  "$numberInt": "0"
+                },
+                "needYield": {
+                  "$numberInt": "0"
+                },
+                "saveState": {
+                  "$numberInt": "0"
+                },
+                "restoreState": {
+                  "$numberInt": "0"
+                },
+                "isEOF": {
+                  "$numberInt": "0"
+                },
+                "docsExamined": {
+                  "$numberInt": "20"
+                },
+                "alreadyHasObj": {
+                  "$numberInt": "0"
+                },
+                "inputStage": {
+                  "stage": "IXSCAN",
+                  "nReturned": {
+                    "$numberInt": "20"
+                  },
+                  "executionTimeMillisEstimate": {
+                    "$numberInt": "0"
+                  },
+                  "works": {
+                    "$numberInt": "20"
+                  },
+                  "advanced": {
+                    "$numberInt": "20"
+                  },
+                  "needTime": {
+                    "$numberInt": "0"
+                  },
+                  "needYield": {
+                    "$numberInt": "0"
+                  },
+                  "saveState": {
+                    "$numberInt": "0"
+                  },
+                  "restoreState": {
+                    "$numberInt": "0"
+                  },
+                  "isEOF": {
+                    "$numberInt": "0"
+                  },
+                  "keyPattern": {
+                    "userId": {
+                      "$numberInt": "1"
+                    },
+                    "status": {
+                      "$numberInt": "1"
+                    },
+                    "createdAt": {
+                      "$numberInt": "-1"
+                    },
+                    "_id": {
+                      "$numberInt": "1"
+                    }
+                  },
+                  "indexName": "history_user_status_date_id",
+                  "isMultiKey": false,
+                  "multiKeyPaths": {
+                    "userId": [],
+                    "status": [],
+                    "createdAt": [],
+                    "_id": []
+                  },
+                  "isUnique": false,
+                  "isSparse": false,
+                  "isPartial": false,
+                  "indexVersion": {
+                    "$numberInt": "2"
+                  },
+                  "direction": "forward",
+                  "indexBounds": {
+                    "userId": [
+                      "[2500, 2500]"
+                    ],
+                    "status": [
+                      "[\"paid\", \"paid\"]"
+                    ],
+                    "createdAt": [
+                      "[MaxKey, MinKey]"
+                    ],
+                    "_id": [
+                      "[MinKey, MaxKey]"
+                    ]
+                  },
+                  "keysExamined": {
+                    "$numberInt": "20"
+                  },
+                  "seeks": {
+                    "$numberInt": "1"
+                  },
+                  "dupsTested": {
+                    "$numberInt": "0"
+                  },
+                  "dupsDropped": {
+                    "$numberInt": "0"
+                  }
+                }
+              }
+            }
+          },
+          "queryShapeHash": "635D4F00B666E61B713823BFECAABA5DFB3B4184E1C2F1FC6D7392224E8D6FD2",
+          "command": {
+            "find": "orders",
+            "filter": {
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "status": "paid"
+            },
+            "sort": {
+              "createdAt": {
+                "$numberInt": "-1"
+              },
+              "_id": {
+                "$numberInt": "1"
+              }
+            },
+            "limit": {
+              "$numberInt": "20"
+            },
+            "$db": "hw2"
+          },
+          "serverInfo": {
+            "host": "e9d8aa3009c2",
+            "port": {
+              "$numberInt": "27017"
+            },
+            "version": "8.0.30",
+            "gitVersion": "360770fbc9b6a893748150d2ab2799e119b9fac9"
+          },
+          "serverParameters": {
+            "internalQueryFacetBufferSizeBytes": {
+              "$numberInt": "104857600"
+            },
+            "internalQueryFacetMaxOutputDocSizeBytes": {
+              "$numberInt": "104857600"
+            },
+            "internalLookupStageIntermediateDocumentMaxSizeBytes": {
+              "$numberInt": "104857600"
+            },
+            "internalDocumentSourceGroupMaxMemoryBytes": {
+              "$numberInt": "104857600"
+            },
+            "internalQueryMaxBlockingSortMemoryUsageBytes": {
+              "$numberInt": "104857600"
+            },
+            "internalQueryProhibitBlockingMergeOnMongoS": {
+              "$numberInt": "0"
+            },
+            "internalQueryMaxAddToSetBytes": {
+              "$numberInt": "104857600"
+            },
+            "internalDocumentSourceSetWindowFieldsMaxMemoryBytes": {
+              "$numberInt": "104857600"
+            },
+            "internalQueryFrameworkControl": "trySbeRestricted",
+            "internalQueryPlannerIgnoreIndexWithCollationForRegex": {
+              "$numberInt": "1"
+            }
+          },
+          "ok": {
+            "$numberInt": "1"
+          },
+          "$clusterTime": {
+            "clusterTime": {
+              "$timestamp": {
+                "t": 1792352715,
+                "i": 4
+              }
+            },
+            "signature": {
+              "hash": {
+                "$binary": {
+                  "base64": "AAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+                  "subType": "00"
+                }
+              },
+              "keyId": {
+                "$numberLong": "0"
+              }
+            }
+          },
+          "operationTime": {
+            "$timestamp": {
+              "t": 1792352715,
+              "i": 4
+            }
+          }
+        },
+        "index": {
+          "filter": {
+            "userId": {
+              "$numberInt": "2500"
+            },
+            "status": "paid"
+          },
+          "sort": {
+            "createdAt": {
+              "$numberInt": "-1"
+            },
+            "_id": {
+              "$numberInt": "1"
+            }
+          },
+          "index": {
+            "userId": {
+              "$numberInt": "1"
+            },
+            "status": {
+              "$numberInt": "1"
+            },
+            "createdAt": {
+              "$numberInt": "-1"
+            },
+            "_id": {
+              "$numberInt": "1"
+            }
+          },
+          "hint": false,
+          "before": {
+            "nReturned": {
+              "$numberInt": "20"
+            },
+            "totalKeysExamined": {
+              "$numberInt": "0"
+            },
+            "totalDocsExamined": {
+              "$numberInt": "10000"
+            },
+            "hasSORT": true
+          },
+          "after": {
+            "nReturned": {
+              "$numberInt": "20"
+            },
+            "totalKeysExamined": {
+              "$numberInt": "20"
+            },
+            "totalDocsExamined": {
+              "$numberInt": "20"
+            },
+            "hasSORT": false
+          },
+          "beforeIds": [
+            "G09928",
+            "G09929",
+            "G09924",
+            "G09925",
+            "G09920",
+            "G09921",
+            "G09916",
+            "G09917",
+            "G09912",
+            "G09913",
+            "G09908",
+            "G09909",
+            "G09904",
+            "G09905",
+            "G09900",
+            "G09901",
+            "G09828",
+            "G09829",
+            "G09824",
+            "G09825"
+          ],
+          "afterIds": [
+            "G09928",
+            "G09929",
+            "G09924",
+            "G09925",
+            "G09920",
+            "G09921",
+            "G09916",
+            "G09917",
+            "G09912",
+            "G09913",
+            "G09908",
+            "G09909",
+            "G09904",
+            "G09905",
+            "G09900",
+            "G09901",
+            "G09828",
+            "G09829",
+            "G09824",
+            "G09825"
+          ],
+          "beforeDocuments": [
+            {
+              "_id": "G09928",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891440000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09929",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891440000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09924",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891320000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09925",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891320000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09920",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891200000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09921",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891200000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09916",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891080000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09917",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891080000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09912",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890960000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09913",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890960000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09908",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890840000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09909",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890840000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09904",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890720000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09905",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890720000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09900",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890600000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09901",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890600000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09828",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777888440000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09829",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777888440000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09824",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777888320000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09825",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777888320000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            }
+          ],
+          "afterDocuments": [
+            {
+              "_id": "G09928",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891440000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09929",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891440000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09924",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891320000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09925",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891320000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09920",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891200000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09921",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891200000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09916",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891080000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09917",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777891080000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09912",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890960000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09913",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890960000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09908",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890840000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09909",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890840000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09904",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890720000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09905",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890720000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09900",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890600000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09901",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777890600000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09828",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777888440000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09829",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777888440000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09824",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777888320000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "G09825",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1777888320000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "server": "8.0.30",
+      "finishedAt": {
+        "$date": {
+          "$numberLong": "1792352715113"
+        }
+      }
+    }
+  },
+  "updatedAt": {
+    "$date": {
+      "$numberLong": "1792352715113"
+    }
+  }
+}

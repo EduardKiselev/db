@@ -1,0 +1,162 @@
+{
+  "dataset": "2026-10-05",
+  "scenarios": {
+    "failover": {
+      "status": "passed",
+      "startedAt": {
+        "$date": {
+          "$numberLong": "1792352764414"
+        }
+      },
+      "solutionHash": "46a2b08f6fbdc82b19dc87c52469b3f48e5c588b0f8f5c82c2041301385255a5",
+      "checks": [
+        "3 data-bearing nodes ready",
+        "first majority write acknowledged",
+        "primary actually changed",
+        "same client instance",
+        "old majority document read",
+        "new majority write acknowledged",
+        "both documents present"
+      ],
+      "artifacts": {
+        "failover": {
+          "connection": "mongodb://m1:27017,m2:27017,m3:27017/hw2?replicaSet=hw2rs",
+          "sameClient": true,
+          "writeConcern": {
+            "w": "majority",
+            "j": true,
+            "wtimeout": {
+              "$numberInt": "10000"
+            }
+          },
+          "before": [
+            {
+              "host": "m1:27017",
+              "role": "PRIMARY"
+            },
+            {
+              "host": "m2:27017",
+              "role": "SECONDARY"
+            },
+            {
+              "host": "m3:27017",
+              "role": "SECONDARY"
+            }
+          ],
+          "firstWrite": {
+            "acknowledged": true,
+            "insertedId": "before",
+            "matchedCount": {
+              "$numberInt": "0"
+            },
+            "modifiedCount": {
+              "$numberInt": "0"
+            },
+            "upsertedCount": {
+              "$numberInt": "1"
+            }
+          },
+          "stepDown": {
+            "ok": {
+              "$numberInt": "1"
+            },
+            "$clusterTime": {
+              "clusterTime": {
+                "$timestamp": {
+                  "t": 1792352764,
+                  "i": 4
+                }
+              },
+              "signature": {
+                "hash": {
+                  "$binary": {
+                    "base64": "AAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+                    "subType": "00"
+                  }
+                },
+                "keyId": {
+                  "$numberLong": "0"
+                }
+              }
+            },
+            "operationTime": {
+              "$timestamp": {
+                "t": 1792352764,
+                "i": 4
+              }
+            }
+          },
+          "retries": [
+            {
+              "attempt": {
+                "$numberInt": "1"
+              },
+              "error": "Waiting for changed primary and two secondaries"
+            }
+          ],
+          "after": [
+            {
+              "host": "m1:27017",
+              "role": "SECONDARY"
+            },
+            {
+              "host": "m2:27017",
+              "role": "PRIMARY"
+            },
+            {
+              "host": "m3:27017",
+              "role": "SECONDARY"
+            }
+          ],
+          "read": {
+            "_id": "before",
+            "message": "majority confirmed before stepDown"
+          },
+          "newWrite": {
+            "acknowledged": true,
+            "insertedId": "after",
+            "matchedCount": {
+              "$numberInt": "0"
+            },
+            "modifiedCount": {
+              "$numberInt": "0"
+            },
+            "upsertedCount": {
+              "$numberInt": "1"
+            }
+          },
+          "documents": [
+            {
+              "_id": "after",
+              "message": "majority confirmed after stepDown"
+            },
+            {
+              "_id": "before",
+              "message": "majority confirmed before stepDown"
+            }
+          ],
+          "checks": [
+            "3 data-bearing nodes ready",
+            "first majority write acknowledged",
+            "primary actually changed",
+            "same client instance",
+            "old majority document read",
+            "new majority write acknowledged",
+            "both documents present"
+          ]
+        }
+      },
+      "server": "8.0.30",
+      "finishedAt": {
+        "$date": {
+          "$numberLong": "1792352765021"
+        }
+      }
+    }
+  },
+  "updatedAt": {
+    "$date": {
+      "$numberLong": "1792352765021"
+    }
+  }
+}

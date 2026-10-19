@@ -1,0 +1,1279 @@
+{
+  "dataset": "2026-10-05",
+  "scenarios": {
+    "data": {
+      "status": "passed",
+      "startedAt": {
+        "$date": {
+          "$numberLong": "1792352399333"
+        }
+      },
+      "solutionHash": "46a2b08f6fbdc82b19dc87c52469b3f48e5c588b0f8f5c82c2041301385255a5",
+      "checks": [
+        "validator strict/error installed",
+        "validation valid",
+        "validation string-price",
+        "validation negative-stock",
+        "complete product documents clothes/L/2",
+        "search clothes/L/2",
+        "complete product documents clothes/M/5",
+        "search clothes/M/5",
+        "complete product documents accessories/L/3",
+        "search accessories/L/3",
+        "complete product documents clothes/L/99",
+        "search clothes/L/99",
+        "L=2 includes A",
+        "complete history documents",
+        "history 20 IDs including date ties",
+        "history other user",
+        "history other status",
+        "history no matches",
+        "report top 5 amounts/order/names",
+        "empty interval",
+        "from included",
+        "catalog price does not rewrite revenue"
+      ],
+      "artifacts": {
+        "data": {
+          "options": {
+            "validator": {
+              "$jsonSchema": {
+                "bsonType": "object",
+                "required": [
+                  "name",
+                  "price",
+                  "category",
+                  "variants"
+                ],
+                "properties": {
+                  "_id": {
+                    "bsonType": "string"
+                  },
+                  "name": {
+                    "bsonType": "string"
+                  },
+                  "category": {
+                    "bsonType": "string"
+                  },
+                  "price": {
+                    "bsonType": "decimal",
+                    "minimum": {
+                      "$numberInt": "0"
+                    }
+                  },
+                  "variants": {
+                    "bsonType": "array",
+                    "items": {
+                      "bsonType": "object",
+                      "required": [
+                        "size",
+                        "stock"
+                      ],
+                      "properties": {
+                        "size": {
+                          "bsonType": "string"
+                        },
+                        "stock": {
+                          "bsonType": [
+                            "int",
+                            "long"
+                          ],
+                          "minimum": {
+                            "$numberInt": "0"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "validationLevel": "strict",
+            "validationAction": "error"
+          },
+          "validation": [
+            {
+              "id": "valid",
+              "code": {
+                "$numberInt": "0"
+              },
+              "details": null
+            },
+            {
+              "id": "string-price",
+              "code": {
+                "$numberInt": "121"
+              },
+              "details": {
+                "failingDocumentId": "string-price",
+                "details": {
+                  "operatorName": "$jsonSchema",
+                  "schemaRulesNotSatisfied": [
+                    {
+                      "operatorName": "properties",
+                      "propertiesNotSatisfied": [
+                        {
+                          "propertyName": "price",
+                          "details": [
+                            {
+                              "operatorName": "bsonType",
+                              "specifiedAs": {
+                                "bsonType": "decimal"
+                              },
+                              "reason": "type did not match",
+                              "consideredValue": "100.00",
+                              "consideredType": "string"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "id": "negative-stock",
+              "code": {
+                "$numberInt": "121"
+              },
+              "details": {
+                "failingDocumentId": "negative-stock",
+                "details": {
+                  "operatorName": "$jsonSchema",
+                  "schemaRulesNotSatisfied": [
+                    {
+                      "operatorName": "properties",
+                      "propertiesNotSatisfied": [
+                        {
+                          "propertyName": "variants",
+                          "details": [
+                            {
+                              "operatorName": "items",
+                              "reason": "At least one item did not match the sub-schema",
+                              "itemIndex": {
+                                "$numberInt": "0"
+                              },
+                              "details": [
+                                {
+                                  "operatorName": "properties",
+                                  "propertiesNotSatisfied": [
+                                    {
+                                      "propertyName": "stock",
+                                      "details": [
+                                        {
+                                          "operatorName": "minimum",
+                                          "specifiedAs": {
+                                            "minimum": {
+                                              "$numberInt": "0"
+                                            }
+                                          },
+                                          "reason": "comparison failed",
+                                          "consideredValue": {
+                                            "$numberInt": "-1"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "searches": [
+            {
+              "category": "clothes",
+              "size": "L",
+              "qty": {
+                "$numberInt": "2"
+              },
+              "documents": [
+                {
+                  "_id": "B",
+                  "name": "Рубашка",
+                  "category": "clothes",
+                  "price": {
+                    "$numberDecimal": "80.00"
+                  },
+                  "variants": [
+                    {
+                      "size": "L",
+                      "stock": {
+                        "$numberInt": "5"
+                      }
+                    },
+                    {
+                      "size": "M",
+                      "stock": {
+                        "$numberInt": "4"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "_id": "C",
+                  "name": "Толстовка",
+                  "category": "clothes",
+                  "price": {
+                    "$numberDecimal": "90.00"
+                  },
+                  "variants": [
+                    {
+                      "size": "L",
+                      "stock": {
+                        "$numberInt": "3"
+                      }
+                    },
+                    {
+                      "size": "M",
+                      "stock": {
+                        "$numberInt": "2"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "found": [
+                "B",
+                "C"
+              ],
+              "expected": [
+                "B",
+                "C"
+              ]
+            },
+            {
+              "category": "clothes",
+              "size": "M",
+              "qty": {
+                "$numberInt": "5"
+              },
+              "documents": [
+                {
+                  "_id": "A",
+                  "name": "Футболка",
+                  "category": "clothes",
+                  "price": {
+                    "$numberDecimal": "100.00"
+                  },
+                  "variants": [
+                    {
+                      "size": "L",
+                      "stock": {
+                        "$numberInt": "0"
+                      }
+                    },
+                    {
+                      "size": "M",
+                      "stock": {
+                        "$numberInt": "10"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "found": [
+                "A"
+              ],
+              "expected": [
+                "A"
+              ]
+            },
+            {
+              "category": "accessories",
+              "size": "L",
+              "qty": {
+                "$numberInt": "3"
+              },
+              "documents": [
+                {
+                  "_id": "D",
+                  "name": "Ремень",
+                  "category": "accessories",
+                  "price": {
+                    "$numberDecimal": "120.00"
+                  },
+                  "variants": [
+                    {
+                      "size": "L",
+                      "stock": {
+                        "$numberInt": "4"
+                      }
+                    },
+                    {
+                      "size": "M",
+                      "stock": {
+                        "$numberInt": "6"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "found": [
+                "D"
+              ],
+              "expected": [
+                "D"
+              ]
+            },
+            {
+              "category": "clothes",
+              "size": "L",
+              "qty": {
+                "$numberInt": "99"
+              },
+              "documents": [],
+              "found": [],
+              "expected": []
+            },
+            {
+              "afterChange": "A/L=2",
+              "documents": [
+                {
+                  "_id": "A",
+                  "name": "Футболка",
+                  "category": "clothes",
+                  "price": {
+                    "$numberDecimal": "100.00"
+                  },
+                  "variants": [
+                    {
+                      "size": "L",
+                      "stock": {
+                        "$numberInt": "2"
+                      }
+                    },
+                    {
+                      "size": "M",
+                      "stock": {
+                        "$numberInt": "10"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "_id": "B",
+                  "name": "Рубашка",
+                  "category": "clothes",
+                  "price": {
+                    "$numberDecimal": "80.00"
+                  },
+                  "variants": [
+                    {
+                      "size": "L",
+                      "stock": {
+                        "$numberInt": "5"
+                      }
+                    },
+                    {
+                      "size": "M",
+                      "stock": {
+                        "$numberInt": "4"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "_id": "C",
+                  "name": "Толстовка",
+                  "category": "clothes",
+                  "price": {
+                    "$numberDecimal": "90.00"
+                  },
+                  "variants": [
+                    {
+                      "size": "L",
+                      "stock": {
+                        "$numberInt": "3"
+                      }
+                    },
+                    {
+                      "size": "M",
+                      "stock": {
+                        "$numberInt": "2"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "found": [
+                "A",
+                "B",
+                "C"
+              ]
+            }
+          ],
+          "history": [
+            {
+              "_id": "H24",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772366400000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H25",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772366400000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H22",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772362800000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H23",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772362800000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H20",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772359200000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H21",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772359200000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H18",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772355600000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H19",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772355600000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H16",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772352000000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H17",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772352000000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H14",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772348400000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H15",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772348400000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H12",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772344800000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H13",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772344800000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H10",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772341200000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H11",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772341200000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H08",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772337600000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H09",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772337600000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H06",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772334000000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "H07",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1772334000000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            }
+          ],
+          "historyIds": [
+            "H24",
+            "H25",
+            "H22",
+            "H23",
+            "H20",
+            "H21",
+            "H18",
+            "H19",
+            "H16",
+            "H17",
+            "H14",
+            "H15",
+            "H12",
+            "H13",
+            "H10",
+            "H11",
+            "H08",
+            "H09",
+            "H06",
+            "H07"
+          ],
+          "otherUser": [
+            {
+              "_id": "other-user",
+              "userId": {
+                "$numberInt": "2501"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1775001600000"
+                }
+              },
+              "status": "paid",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            }
+          ],
+          "otherStatus": [
+            {
+              "_id": "other-status",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1775001600000"
+                }
+              },
+              "status": "cancelled",
+              "items": [
+                {
+                  "sku": "F",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "1"
+                  },
+                  "price": {
+                    "$numberDecimal": "150.00"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "excluded-cancelled",
+              "userId": {
+                "$numberInt": "2500"
+              },
+              "createdAt": {
+                "$date": {
+                  "$numberLong": "1768435200000"
+                }
+              },
+              "status": "cancelled",
+              "items": [
+                {
+                  "sku": "A",
+                  "size": "M",
+                  "qty": {
+                    "$numberInt": "999"
+                  },
+                  "price": {
+                    "$numberDecimal": "100.00"
+                  }
+                }
+              ]
+            }
+          ],
+          "noHistory": [],
+          "historyExpected": [
+            "H24",
+            "H25",
+            "H22",
+            "H23",
+            "H20",
+            "H21",
+            "H18",
+            "H19",
+            "H16",
+            "H17",
+            "H14",
+            "H15",
+            "H12",
+            "H13",
+            "H10",
+            "H11",
+            "H08",
+            "H09",
+            "H06",
+            "H07"
+          ],
+          "report": [
+            {
+              "qty": {
+                "$numberInt": "3"
+              },
+              "revenue": {
+                "$numberDecimal": "320.00"
+              },
+              "sku": "A",
+              "name": "Футболка"
+            },
+            {
+              "qty": {
+                "$numberInt": "4"
+              },
+              "revenue": {
+                "$numberDecimal": "320.00"
+              },
+              "sku": "B",
+              "name": "Рубашка"
+            },
+            {
+              "qty": {
+                "$numberInt": "3"
+              },
+              "revenue": {
+                "$numberDecimal": "270.00"
+              },
+              "sku": "C",
+              "name": "Толстовка"
+            },
+            {
+              "qty": {
+                "$numberInt": "2"
+              },
+              "revenue": {
+                "$numberDecimal": "240.00"
+              },
+              "sku": "D",
+              "name": "Ремень"
+            },
+            {
+              "qty": {
+                "$numberInt": "1"
+              },
+              "revenue": {
+                "$numberDecimal": "200.00"
+              },
+              "sku": "E",
+              "name": "Сумка"
+            }
+          ],
+          "reportParameters": {
+            "from": {
+              "$date": {
+                "$numberLong": "1767225600000"
+              }
+            },
+            "to": {
+              "$date": {
+                "$numberLong": "1769904000000"
+              }
+            }
+          },
+          "emptyReport": {
+            "from": {
+              "$date": {
+                "$numberLong": "1704067200000"
+              }
+            },
+            "to": {
+              "$date": {
+                "$numberLong": "1706745600000"
+              }
+            },
+            "rows": []
+          },
+          "boundaryReport": {
+            "from": {
+              "$date": {
+                "$numberLong": "1767225600000"
+              }
+            },
+            "to": {
+              "$date": {
+                "$numberLong": "1767225600001"
+              }
+            },
+            "rows": [
+              {
+                "qty": {
+                  "$numberInt": "4"
+                },
+                "revenue": {
+                  "$numberDecimal": "320.00"
+                },
+                "sku": "B",
+                "name": "Рубашка"
+              },
+              {
+                "qty": {
+                  "$numberInt": "2"
+                },
+                "revenue": {
+                  "$numberDecimal": "200.00"
+                },
+                "sku": "A",
+                "name": "Футболка"
+              }
+            ]
+          },
+          "afterPriceReport": {
+            "from": {
+              "$date": {
+                "$numberLong": "1767225600000"
+              }
+            },
+            "to": {
+              "$date": {
+                "$numberLong": "1769904000000"
+              }
+            },
+            "changedProduct": {
+              "sku": "A",
+              "price": {
+                "$numberDecimal": "999.00"
+              }
+            },
+            "rows": [
+              {
+                "qty": {
+                  "$numberInt": "3"
+                },
+                "revenue": {
+                  "$numberDecimal": "320.00"
+                },
+                "sku": "A",
+                "name": "Футболка"
+              },
+              {
+                "qty": {
+                  "$numberInt": "4"
+                },
+                "revenue": {
+                  "$numberDecimal": "320.00"
+                },
+                "sku": "B",
+                "name": "Рубашка"
+              },
+              {
+                "qty": {
+                  "$numberInt": "3"
+                },
+                "revenue": {
+                  "$numberDecimal": "270.00"
+                },
+                "sku": "C",
+                "name": "Толстовка"
+              },
+              {
+                "qty": {
+                  "$numberInt": "2"
+                },
+                "revenue": {
+                  "$numberDecimal": "240.00"
+                },
+                "sku": "D",
+                "name": "Ремень"
+              },
+              {
+                "qty": {
+                  "$numberInt": "1"
+                },
+                "revenue": {
+                  "$numberDecimal": "200.00"
+                },
+                "sku": "E",
+                "name": "Сумка"
+              }
+            ]
+          },
+          "expected": [
+            {
+              "sku": "A",
+              "name": "Футболка",
+              "qty": {
+                "$numberInt": "3"
+              },
+              "revenue": "320.00"
+            },
+            {
+              "sku": "B",
+              "name": "Рубашка",
+              "qty": {
+                "$numberInt": "4"
+              },
+              "revenue": "320.00"
+            },
+            {
+              "sku": "C",
+              "name": "Толстовка",
+              "qty": {
+                "$numberInt": "3"
+              },
+              "revenue": "270.00"
+            },
+            {
+              "sku": "D",
+              "name": "Ремень",
+              "qty": {
+                "$numberInt": "2"
+              },
+              "revenue": "240.00"
+            },
+            {
+              "sku": "E",
+              "name": "Сумка",
+              "qty": {
+                "$numberInt": "1"
+              },
+              "revenue": "200.00"
+            }
+          ],
+          "checks": [
+            "validator strict/error installed",
+            "validation valid",
+            "validation string-price",
+            "validation negative-stock",
+            "complete product documents clothes/L/2",
+            "search clothes/L/2",
+            "complete product documents clothes/M/5",
+            "search clothes/M/5",
+            "complete product documents accessories/L/3",
+            "search accessories/L/3",
+            "complete product documents clothes/L/99",
+            "search clothes/L/99",
+            "L=2 includes A",
+            "complete history documents",
+            "history 20 IDs including date ties",
+            "history other user",
+            "history other status",
+            "history no matches",
+            "report top 5 amounts/order/names",
+            "empty interval",
+            "from included",
+            "catalog price does not rewrite revenue"
+          ]
+        }
+      },
+      "server": "8.0.30",
+      "finishedAt": {
+        "$date": {
+          "$numberLong": "1792352399552"
+        }
+      }
+    }
+  },
+  "updatedAt": {
+    "$date": {
+      "$numberLong": "1792352399552"
+    }
+  }
+}
