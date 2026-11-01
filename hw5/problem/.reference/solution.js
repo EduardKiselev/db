@@ -1,38 +1,47 @@
 // Заполняйте TODO. c — переданная база; функции выполняют реальные запросы MongoDB.
 // Служебный lab.js менять не требуется. Контракты и порядок опытов — в Задание.md.
+
+// Валидатор products в режиме strict/error: обязательные поля, типы,
+// структура элементов variants, неотрицательные цены и остатки.
+// Уникальность размеров внутри товара схема не проверяет — её обеспечивает
+// приложение (см. README, §3.3 «что проверяет база, а что приложение»).
 globalThis.installValidator = async c => {
   return c.runCommand({
-    collMod: "products",
+    collMod: 'products',
     validator: {
       $jsonSchema: {
-      bsonType: "object",
-      required: ["name", "price", "category", "variants"],
-      properties: {
-        _id: { bsonType: 'string' },
-        name: { bsonType: "string" },
-        category: { bsonType: "string" },
-        price: { bsonType: "decimal", minimum: 0 },
-        variants: {
-          bsonType: 'array',
-          items: {
-            bsonType: 'object',
-            required: ['size', 'stock'],
-            properties: {
-              size: { bsonType: 'string' },
-              stock: { bsonType: ['int', 'long'], minimum: 0 }
+        bsonType: 'object',
+        required: ['_id', 'name', 'category', 'price', 'variants'],
+        properties: {
+          _id: { bsonType: 'string' },
+          name: { bsonType: 'string' },
+          category: { bsonType: 'string' },
+          // Decimal128: строковая цена отклоняется именно по типу.
+          price: { bsonType: 'decimal', minimum: 0 },
+          variants: {
+            bsonType: 'array',
+            items: {
+              bsonType: 'object',
+              required: ['size', 'stock'],
+              properties: {
+                size: { bsonType: 'string' },
+                stock: { bsonType: ['int', 'long'], minimum: 0 }
+              }
             }
           }
         }
-
-      }
       }
     },
-    validationAction: "error",
-    validationLevel: "strict"
-    })
+    validationLevel: 'strict',
+    validationAction: 'error'
+  });
 };
 
 // Возврат: Promise массива полных Product; порядок _id ASC; [] при отсутствии.
+// $elemMatch обязателен: размер и достаточный остаток должны относиться
+// к одному и тому же варианту, а не к разным элементам массива.
+// Collation не задаём — сравнение строк точное и чувствительное к регистру,
+// а явная collation помешала бы использованию индекса в сценарии `index`.
 globalThis.searchProducts = async (c, {category, size, qty}) => {
   return c.products.find({
     category: category,
@@ -43,10 +52,9 @@ globalThis.searchProducts = async (c, {category, size, qty}) => {
 // Технический helper: верните MongoDB cursor с фильтром, сортировкой и limit.
 // Один и тот же запрос используется для результата и explain в опыте с индексом.
 globalThis.historyCursor = (c, {userId, status}) => {
-  return c.orders.find({
-    userId: userId,
-    status: status
-  }).sort({ createdAt: -1, _id: 1 }).limit(20);
+  return c.orders.find({ userId: NumberInt(userId), status: status })
+    .sort({ createdAt: -1, _id: 1 })
+    .limit(20);
 };
 globalThis.history = async (c, input) => historyCursor(c, input).toArray();
 
@@ -59,6 +67,10 @@ globalThis.historyIndex = { userId: 1, status: 1, createdAt: -1, _id: 1 };
 globalThis.usesHistoryHint = false;
 
 // Возврат: Promise массива {sku, name, qty, revenue}; revenue — Decimal128.
+// Период [from, to): начало включается, конец исключается. Только status 'paid'.
+// Выручка считается по items.price — это цена на момент покупки, поэтому
+// изменение текущей цены в каталоге не переписывает историю.
+// qty(int) * price(Decimal128) даёт Decimal128, $sum сохраняет этот тип.
 globalThis.report = async (c, from, to) => {
   return c.orders.aggregate([
     { $match: { status: 'paid', createdAt: { $gte: from, $lt: to } } },
@@ -68,12 +80,13 @@ globalThis.report = async (c, from, to) => {
         qty: { $sum: '$items.qty' },
         revenue: { $sum: { $multiply: ['$items.qty', '$items.price'] } }
     } },
-        { $lookup: { from: 'products', localField: '_id', foreignField: '_id', as: 'product' } },
-          { $unwind: '$product' },
+    // Названия берём из каталога; размеры одного товара уже объединены в $group.
+    { $lookup: { from: 'products', localField: '_id', foreignField: '_id', as: 'product' } },
+    { $unwind: '$product' },
     { $project: { _id: 0, sku: '$_id', name: '$product.name', qty: 1, revenue: 1 } },
     { $sort: { revenue: -1, sku: 1 } },
     { $limit: 5 }
-  ]).toArray();  
+  ]).toArray();
 };
 
 // request: {operationId, userId, items:[{sku,size,qty},{sku,size,qty}]}.
@@ -86,8 +99,10 @@ globalThis.report = async (c, from, to) => {
 globalThis.purchase = async (request, trace = () => {}) => {
   const { operationId, userId, items } = request;
   return transaction(async c => {
-
-    // 1. Обработка повторного запроса: _id заказа равен operationId,
+    // 1. Защита от повторного бизнес-запроса: _id заказа равен operationId,
+    //    поэтому повтор физически не может создать второй документ.
+    //    Сравниваем значения userId/sku/size/qty по порядку, а не текст JSON
+    //    и не текущую цену каталога — они не входят в идентичность запроса.
     const existing = await c.orders.findOne({ _id: operationId });
     if (existing) {
       const sameRequest =
@@ -99,12 +114,14 @@ globalThis.purchase = async (request, trace = () => {}) => {
           saved.size === items[i].size &&
           Number(saved.qty) === Number(items[i].qty));
       if (sameRequest) return existing; // подтверждённая покупка — вернуть как есть
-      throw HWError('REQUEST_CONFLICT', 'operationId уже использован с другим заказом');
+      throw HWError('REQUEST_CONFLICT', 'operationId уже использован с другими параметрами');
     }
 
-    // 2. Списание остатков.
-    //    matchedCount == 0 означает, что товара, размера или остатка нет.
+    // 2. Списание остатков. Проверка достаточности встроена в ФИЛЬТР обновления
+    //    ($elemMatch + stock >= qty), а не выполняется отдельным чтением:
+    //    matchedCount === 0 означает, что товара, размера или остатка нет.
     //    $inc обязательно через NumberInt — иначе stock стал бы double
+    //    и строгий валидатор products отклонил бы обновление (код 121).
     const orderItems = [];
     for (const item of items) {
       const qty = NumberInt(item.qty);
@@ -120,11 +137,13 @@ globalThis.purchase = async (request, trace = () => {}) => {
       }
       // Цена позиции — факт на момент покупки, берётся из каталога внутри
       // той же транзакции (readConcern snapshot) и сохраняется в заказ.
+      // Проекция передаётся в legacy-форме mongosh: {price:1}, а не
+      // {projection:{price:1}} — второй вариант вернул бы только _id.
       const product = await c.products.findOne({ _id: item.sku }, { price: 1 });
       orderItems.push({ sku: item.sku, size: item.size, qty: qty, price: product.price });
     }
 
-    // 3. Создаем заказ
+    // 3. Один заказ на всю покупку; статус и дату определяет операция, не клиент.
     const order = {
       _id: operationId,
       userId: NumberInt(userId),
@@ -148,7 +167,7 @@ globalThis.writeProbe = async (c, id, message) => {
   return c.probe.updateOne(
     { _id: id },
     { $set: { message: message } },
-    { upsert: true, writeConcern: { w: 'majority', j: true, wtimeout: 5000 } }
+    { upsert: true, writeConcern: { w: 'majority', j: true, wtimeout: 10000 } }
   );
 };
 // Возврат — документ c.probe с указанным _id либо null.
